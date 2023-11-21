@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 
 const reactionSchema = new mongoose.Schema({
     reactionId: {
-
+        type: Schema.Types.ObjectId,
+        default: new ObjectId,
     },
     rectionBody: {
         type: String, 
@@ -16,29 +17,46 @@ const reactionSchema = new mongoose.Schema({
     createdAt: {
         type: Date, 
         default: Date.now,
-        // get: // Use a getter method to format the timestamp on query
+        get: formatDate
     }
 })
 
-const thoughtSchema = new mongoose.Schema({
-    thoughtText: {
-        type: String, 
-        unique: true, 
-        minLength: 1,
-        maxLength: 280
+const thoughtSchema = new mongoose.Schema(
+    {
+        thoughtText: {
+            type: String, 
+            unique: true, 
+            minLength: 1,
+            maxLength: 280
+        },
+        createdAt: {
+            type: Date, 
+            default: Date.now,
+            get: formatDate
+        },
+        username: {
+            type: String,
+            required: true
+        },
+        reactions: [reactionSchema]
     },
-    createdAt: {
-        type: Date, 
-        default: Date.now,
-        // get: // Use a getter method to format the timestamp on query
-    },
-    username: {
+    {
+        toJSON: {
+            virtuals: true,
+        },
+        id: false,
+    }
+)
 
-    },
-    reactions: [reactionSchema]
+function formatDate(date) {
+    return date.toLocaleDateString();
+};
+
+thoughtSchema.virtual('reactionCount').get(function () {
+    return this.reactions.length;
 })
 
-const Thought = mongoose.model('Thought',thoughtSchema);
+const Thought = mongoose.model('thought',thoughtSchema);
 
 module.exports = Thought;
 
