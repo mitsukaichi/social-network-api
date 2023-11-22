@@ -5,7 +5,7 @@ const { ObjectId } = require('mongodb');
 // GET all users
 router.get('/', async (req,res) => {
     try {
-        const result = await User.find({});
+        const result = await User.find({ });
         res.status(200).send(result);
     } catch(err) {
         res.status(500).send(err);
@@ -98,16 +98,15 @@ router.post('/:id/friends/:friendId', async (req, res) => {
 
 router.delete('/:id/friends/:friendId', async (req, res) => {
     try {
-        const newFriend = await User.findOneAndUpdate(
+        const deleteFriend = await User.findOneAndUpdate(
             { _id : new ObjectId(req.params.id) },
             { $pull: { friends: new ObjectId(req.params.friendId) }},
             { new: true}
         );
-        console.log(newFriend);
-        if(!newFriend) {
+        if(!deleteFriend) {
             res.status(404).json({message: `Couldn't delete friend. Make sure both IDs are correct`})
         }
-        res.status(200).send(newFriend);
+        res.status(200).send(deleteFriend);
     } catch(err){
         res.status(500).send(err);
     }

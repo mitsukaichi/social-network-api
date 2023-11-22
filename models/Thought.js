@@ -5,7 +5,7 @@ const reactionSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         default: new mongoose.Types.ObjectId,
     },
-    rectionBody: {
+    reactionBody: {
         type: String, 
         required: true,
         maxLength: 280
