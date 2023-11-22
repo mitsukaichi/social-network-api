@@ -66,9 +66,9 @@ router.delete('/:id', async (req, res) => {
         // Get the list of thoughts returned from the previous request and delete those IDs from Thoughts
         const deletedThoughts = await Thought.deleteMany({ _id: { $in: deletedUser.thoughts}});
         if (deletedThoughts) {
-            res.status(200).send(result)
+            res.status(200).send({message: `User and the thoughts by this user were deleted.`})
         } else {
-            res.status(200).json(result, {message: `User was deleted. This user didn't have any thoughts`})
+            res.status(200).json({message: `User was deleted. This user didn't have any thoughts`})
         }
     } catch(err){
         res.status(500).send(err);
@@ -85,7 +85,6 @@ router.post('/:id/friends/:friendId', async (req, res) => {
             { $addToSet: { friends: new ObjectId(req.params.friendId) }},
             { new: true}
         );
-        console.log(newFriend);
         if(!newFriend) {
             res.status(404).json({message: `Couldn't add as new friend. Make sure both IDs are correct`})
         }
@@ -97,5 +96,20 @@ router.post('/:id/friends/:friendId', async (req, res) => {
 
 // DELETE to remove a friend from a user's friend list
 
-
+router.delete('/:id/friends/:friendId', async (req, res) => {
+    try {
+        const newFriend = await User.findOneAndUpdate(
+            { _id : new ObjectId(req.params.id) },
+            { $pull: { friends: new ObjectId(req.params.friendId) }},
+            { new: true}
+        );
+        console.log(newFriend);
+        if(!newFriend) {
+            res.status(404).json({message: `Couldn't delete friend. Make sure both IDs are correct`})
+        }
+        res.status(200).send(newFriend);
+    } catch(err){
+        res.status(500).send(err);
+    }
+})
 module.exports = router;
