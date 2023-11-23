@@ -1,185 +1,46 @@
 # social-network-api
 
-## Acceptance Criteria
+## About this project
+
+This project was done as part of the assignments in the UC Berkeley full stuck web developer coding bootcamp. In this assignment, the students are tasked to build an API that meets the following requirements from scratch:
 
 ```md
-GIVEN a social network API
-WHEN I enter the command to invoke the application
-THEN my server is started and the Mongoose models are synced to the MongoDB database
-WHEN I open API GET routes in Insomnia for users and thoughts
-THEN the data for each of these routes is displayed in a formatted JSON
-WHEN I test API POST, PUT, and DELETE routes in Insomnia
-THEN I am able to successfully create, update, and delete users and thoughts in my database
-WHEN I test API POST and DELETE routes in Insomnia
-THEN I am able to successfully create and delete reactions to thoughts and add and remove friends to a user’s friend list
+- Command line propompt to start the local server with the Mongoose models and the MongoDB database
+- You can create, update, and delete users and thoughts in the database
+- You can create and delete reactions to thoughts and add and remove friends to a user’s friend list
 ```
 
-## Mock Up
+## Use
 
-The following animations show examples of the application's API routes being tested in Insomnia.
+- This is application is not deployed for the public use
+- Demo video: https://drive.google.com/file/d/1-iuL50aiR8PxN70qf44V2gWeOjq5Efmr/view
+- Screenshot: ![screenshot](https://github.com/mitsukaichi/tech-blog/assets/45612744/4a9901b2-7f07-46bc-931b-0eaf72ba4fa7)
 
-The following animation shows GET routes to return all users and all thoughts being tested in Insomnia:
+## Resources referenced while building this
+- [How to delete a specific nested subdocument completely from an document : MongoDB
+Developer Community](https://www.mongodb.com/community/forums/t/how-to-delete-a-specific-nested-subdocument-completely-from-an-document/100219)
+- [Mongo: How do I insert another subdocument to an existing document : stackoverflow](https://stackoverflow.com/questions/19372093/mongo-how-do-i-insert-another-subdocument-to-an-existing-document)
+- [ObjectId.toString() : MongoDB Manual](https://www.mongodb.com/docs/manual/reference/method/ObjectId.toString/#:~:text=toString(),)
+- [Query an Array of Embedded Documents : MongoDB Manual](https://www.mongodb.com/docs/v7.0/tutorial/query-array-of-documents/)
+- [Difference between res.json vs res.send vs res.end in Express.js](https://medium.com/gist-for-js/use-of-res-json-vs-res-send-vs-res-end-in-express-b50688c0cddf)
 
-![Demo of GET routes to return all users and all thoughts being tested in Insomnia.](./Assets/18-nosql-homework-demo-01.gif)
 
-The following animation shows GET routes to return a single user and a single thought being tested in Insomnia:
+### Things I learnt from this challenge
 
-![Demo that shows GET routes to return a single user and a single thought being tested in Insomnia.](./Assets/18-nosql-homework-demo-02.gif)
+- Overview of the MongoDB CRUD operations - how this is different from MySQL / Sqeualize
+- Overview of the model creation with mongoose - some additional features only available through mongoose
+- It's sometimes confusing to understand which functionalities are coming from either MongoDB or mongoose. You may need to double check which documentation you need to refer to debug some errors
+- I kept getting the error of "module not found" error as I needed to specify the filepath as '../../models' from the file in routes > api. I need a better understanding of how exactly those filepath specifications work.
+- Difference between res.json vs res.send vs res.end in Express.js (from the referenced article listed above)
 
-The following animation shows the POST, PUT, and DELETE routes for users being tested in Insomnia:
+### License
 
-![Demo that shows the POST, PUT, and DELETE routes for users being tested in Insomnia.](./Assets/18-nosql-homework-demo-03.gif)
+MIT License
 
-In addition to this, your walkthrough video should show the POST, PUT, and DELETE routes for thoughts being tested in Insomnia.
+Copyright (c) [2023] [Minami Mukai]
 
-The following animation shows the POST and DELETE routes for a user’s friend list being tested in Insomnia:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-![Demo that shows the POST and DELETE routes for a user’s friend list being tested in Insomnia.](./Assets/18-nosql-homework-demo-04.gif)
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-In addition to this, your walkthrough video should show the POST and DELETE routes for reactions to thoughts being tested in Insomnia.
-
-## Getting Started
-
-Be sure to have MongoDB installed on your machine. Follow the [MongoDB installation guide on The Full-Stack Blog](https://coding-boot-camp.github.io/full-stack/mongodb/how-to-install-mongodb) to install MongoDB locally.
-
-Use the following guidelines to set up your models and API routes:
-
-### Models
-
-**User**:
-
-* `username`
-  * String
-  * Unique
-  * Required
-  * Trimmed
-
-* `email`
-  * String
-  * Required
-  * Unique
-  * Must match a valid email address (look into Mongoose's matching validation)
-
-* `thoughts`
-  * Array of `_id` values referencing the `Thought` model
-
-* `friends`
-  * Array of `_id` values referencing the `User` model (self-reference)
-
-**Schema Settings**:
-
-Create a virtual called `friendCount` that retrieves the length of the user's `friends` array field on query.
-
----
-
-**Thought**:
-
-* `thoughtText`
-  * String
-  * Required
-  * Must be between 1 and 280 characters
-
-* `createdAt`
-  * Date
-  * Set default value to the current timestamp
-  * Use a getter method to format the timestamp on query
-
-* `username` (The user that created this thought)
-  * String
-  * Required
-
-* `reactions` (These are like replies)
-  * Array of nested documents created with the `reactionSchema`
-
-**Schema Settings**:
-
-Create a virtual called `reactionCount` that retrieves the length of the thought's `reactions` array field on query.
-
----
-
-**Reaction** (SCHEMA ONLY)
-
-* `reactionId`
-  * Use Mongoose's ObjectId data type
-  * Default value is set to a new ObjectId
-
-* `reactionBody`
-  * String
-  * Required
-  * 280 character maximum
-
-* `username`
-  * String
-  * Required
-
-* `createdAt`
-  * Date
-  * Set default value to the current timestamp
-  * Use a getter method to format the timestamp on query
-
-**Schema Settings**:
-
-This will not be a model, but rather will be used as the `reaction` field's subdocument schema in the `Thought` model.
-
-### API Routes
-
-**`/api/users`**
-
-* `GET` all users
-
-* `GET` a single user by its `_id` and populated thought and friend data
-
-* `POST` a new user:
-
-```json
-// example data
-{
-  "username": "lernantino",
-  "email": "lernantino@gmail.com"
-}
-```
-
-* `PUT` to update a user by its `_id`
-
-* `DELETE` to remove user by its `_id`
-
-**BONUS**: Remove a user's associated thoughts when deleted.
-
----
-
-**`/api/users/:userId/friends/:friendId`**
-
-* `POST` to add a new friend to a user's friend list
-
-* `DELETE` to remove a friend from a user's friend list
-
----
-
-**`/api/thoughts`**
-
-* `GET` to get all thoughts
-
-* `GET` to get a single thought by its `_id`
-
-* `POST` to create a new thought (don't forget to push the created thought's `_id` to the associated user's `thoughts` array field)
-
-```json
-// example data
-{
-  "thoughtText": "Here's a cool thought...",
-  "username": "lernantino",
-  "userId": "5edff358a0fcb779aa7b118b"
-}
-```
-
-* `PUT` to update a thought by its `_id`
-
-* `DELETE` to remove a thought by its `_id`
-
----
-
-**`/api/thoughts/:thoughtId/reactions`**
-
-* `POST` to create a reaction stored in a single thought's `reactions` array field
-
-* `DELETE` to pull and remove a reaction by the reaction's `reactionId` value
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
